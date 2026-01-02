@@ -37,9 +37,8 @@
 import Foundation
 import NetworkExtension
 import TunnelKitCore
-import SwiftyBeaver
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: NETunnelInterface.self)
 
 /// `TunnelInterface` implementation via NetworkExtension.
 public class NETunnelInterface: TunnelInterface {

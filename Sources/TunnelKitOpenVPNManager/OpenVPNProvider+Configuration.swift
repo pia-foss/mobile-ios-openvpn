@@ -36,12 +36,12 @@
 
 import Foundation
 import NetworkExtension
-import SwiftyBeaver
 import TunnelKitManager
 import TunnelKitOpenVPNCore
 import __TunnelKitUtils
+import TunnelKitCore
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: OpenVPNProvider.Configuration.self)
 
 extension OpenVPNProvider {
     private struct ExtraKeys {
@@ -58,7 +58,6 @@ extension OpenVPNProvider {
             prefersResolvedAddresses: false,
             resolvedAddresses: nil,
             shouldDebug: false,
-            debugLogFormat: nil,
             masksPrivateData: true,
             versionIdentifier: nil
         )
@@ -82,9 +81,6 @@ extension OpenVPNProvider {
         /// Enables debugging.
         public var shouldDebug: Bool
         
-        /// Optional debug log format (SwiftyBeaver format).
-        public var debugLogFormat: String?
-        
         /// Mask private data in debug log (default is `true`).
         public var masksPrivateData: Bool?
         
@@ -100,7 +96,6 @@ extension OpenVPNProvider {
             prefersResolvedAddresses = ConfigurationBuilder.defaults.prefersResolvedAddresses
             resolvedAddresses = nil
             shouldDebug = ConfigurationBuilder.defaults.shouldDebug
-            debugLogFormat = ConfigurationBuilder.defaults.debugLogFormat
             masksPrivateData = ConfigurationBuilder.defaults.masksPrivateData
             versionIdentifier = ConfigurationBuilder.defaults.versionIdentifier
         }
@@ -116,7 +111,6 @@ extension OpenVPNProvider {
                 prefersResolvedAddresses: prefersResolvedAddresses,
                 resolvedAddresses: resolvedAddresses,
                 shouldDebug: shouldDebug,
-                debugLogFormat: shouldDebug ? debugLogFormat : nil,
                 masksPrivateData: masksPrivateData,
                 versionIdentifier: versionIdentifier
             )
@@ -137,9 +131,6 @@ extension OpenVPNProvider {
 
         /// - Seealso: `OpenVPNProvider.ConfigurationBuilder.shouldDebug`
         public let shouldDebug: Bool
-        
-        /// - Seealso: `OpenVPNProvider.ConfigurationBuilder.debugLogFormat`
-        public let debugLogFormat: String?
         
         /// - Seealso: `OpenVPNProvider.ConfigurationBuilder.masksPrivateData`
         public let masksPrivateData: Bool?
@@ -327,7 +318,6 @@ extension OpenVPNProvider.Configuration {
         builder.prefersResolvedAddresses = prefersResolvedAddresses
         builder.resolvedAddresses = resolvedAddresses
         builder.shouldDebug = shouldDebug
-        builder.debugLogFormat = debugLogFormat
         builder.masksPrivateData = masksPrivateData
         builder.versionIdentifier = versionIdentifier
         return builder

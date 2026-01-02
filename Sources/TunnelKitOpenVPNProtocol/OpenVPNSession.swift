@@ -35,13 +35,12 @@
 //
 
 import Foundation
-import SwiftyBeaver
 import TunnelKitCore
 import TunnelKitOpenVPNCore
 import CTunnelKitCore
 import CTunnelKitOpenVPNProtocol
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: OpenVPNSession.self)
 
 /// Observes major events notified by a `OpenVPNSession`.
 public protocol OpenVPNSessionDelegate: AnyObject {
@@ -554,13 +553,13 @@ public class OpenVPNSession: Session {
         let interval: TimeInterval
         if let keepAliveInterval = keepAliveInterval {
             interval = keepAliveInterval
-            log.verbose("Schedule ping after \(interval.asTimeString)")
+            log.debug("Schedule ping after \(interval.asTimeString)")
         } else {
             interval = CoreConfiguration.OpenVPN.pingTimeoutCheckInterval
-            log.verbose("Schedule ping timeout check after \(interval.asTimeString)")
+            log.debug("Schedule ping timeout check after \(interval.asTimeString)")
         }
         queue.asyncAfter(deadline: .now() + interval) { [weak self] in
-            log.verbose("Running ping block")
+            log.debug("Running ping block")
             self?.ping()
         }
     }
@@ -671,7 +670,7 @@ public class OpenVPNSession: Session {
                 shutdown(error: e)
                 return
             }
-            log.verbose("TLS.auth: Still can't pull ciphertext")
+            log.debug("TLS.auth: Still can't pull ciphertext")
             return
         }
 
@@ -700,7 +699,7 @@ public class OpenVPNSession: Session {
                 shutdown(error: e)
                 return
             }
-            log.verbose("TLS.ifconfig: Still can't pull ciphertext")
+            log.debug("TLS.ifconfig: Still can't pull ciphertext")
             return
         }
         
@@ -841,7 +840,7 @@ public class OpenVPNSession: Session {
                     shutdown(error: e)
                     return
                 }
-                log.verbose("TLS.connect: No available ciphertext to pull")
+                log.debug("TLS.connect: No available ciphertext to pull")
             }
             
             if negotiationKey.shouldOnTLSConnect() {

@@ -24,12 +24,11 @@
 //
 
 import Foundation
-import SwiftyBeaver
 import TunnelKitCore
 import CTunnelKitCore
 import __TunnelKitUtils
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: OpenVPN.ConfigurationParser.self)
 
 extension OpenVPN {
 
@@ -249,9 +248,9 @@ extension OpenVPN {
             var optProxyBypass: [String]?
             var optRedirectGateway: Set<RedirectGateway>?
 
-            log.verbose("Configuration file:")
+            log.debug("Configuration file:")
             for line in lines {
-                log.verbose(line)
+                log.debug("\(line)")
                 
                 var isHandled = false
                 var strippedLine = line

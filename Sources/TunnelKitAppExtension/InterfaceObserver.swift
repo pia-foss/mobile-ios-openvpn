@@ -41,9 +41,9 @@ import SystemConfiguration.CaptiveNetwork
 #else
 import CoreWLAN
 #endif
-import SwiftyBeaver
+import TunnelKitCore
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: InterfaceObserver.self)
 
 /// Observes changes in the current Wi-Fi network.
 public class InterfaceObserver: NSObject {
