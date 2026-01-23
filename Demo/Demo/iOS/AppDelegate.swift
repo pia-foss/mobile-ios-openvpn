@@ -25,9 +25,6 @@
 
 import UIKit
 import NetworkExtension
-import SwiftyBeaver
-
-private let log = SwiftyBeaver.self
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -36,11 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let logDestination = ConsoleDestination()
-        logDestination.minLevel = .debug
-        logDestination.format = "$DHH:mm:ss$d $L $N.$F:$l - $M"
-        log.addDestination(logDestination)
-        
         // Override point for customization after application launch.
         return true
     }

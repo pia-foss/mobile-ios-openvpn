@@ -36,12 +36,11 @@
 
 import Foundation
 import NetworkExtension
-import SwiftyBeaver
 import TunnelKitCore
 import TunnelKitAppExtension
 import TunnelKitOpenVPNManager
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: ConnectionStrategy.self)
 
 class ConnectionStrategy {
     struct Endpoint: CustomStringConvertible {

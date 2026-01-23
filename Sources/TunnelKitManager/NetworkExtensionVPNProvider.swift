@@ -25,9 +25,9 @@
 
 import Foundation
 import NetworkExtension
-import SwiftyBeaver
+import TunnelKitCore
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: NetworkExtensionVPNProvider.self)
 
 /// `VPNProvider` based on the NetworkExtension framework.
 public class NetworkExtensionVPNProvider: VPNProvider {

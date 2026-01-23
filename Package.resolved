@@ -1,25 +1,24 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "openssl-apple",
-        "repositoryURL": "git@github.com:pia-foss/ios-openssl.git",
-        "state": {
-          "branch": "main",
-          "revision": "8895baef87867f2a2b8a33578d6c634a14b12a9a",
-          "version": null
-        }
-      },
-      {
-        "package": "SwiftyBeaver",
-        "repositoryURL": "https://github.com/SwiftyBeaver/SwiftyBeaver",
-        "state": {
-          "branch": null,
-          "revision": "2c039501d6eeb4d4cd4aec4a8d884ad28862e044",
-          "version": "1.9.5"
-        }
+  "originHash" : "8ba34f1660f7a248aba66932a6a45915089a3af074a01f073ca7adae1fceb22f",
+  "pins" : [
+    {
+      "identity" : "ios-openssl",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:pia-foss/ios-openssl.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "ea32980bbd431cd2fd505538093c6258b0972099"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log",
+      "state" : {
+        "revision" : "bc386b95f2a16ccd0150a8235e7c69eab2b866ca",
+        "version" : "1.8.0"
+      }
+    }
+  ],
+  "version" : 3
 }

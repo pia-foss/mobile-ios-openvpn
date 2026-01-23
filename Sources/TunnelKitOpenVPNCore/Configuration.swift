@@ -35,10 +35,7 @@
 //
 
 import Foundation
-import SwiftyBeaver
 import TunnelKitCore
-
-private let log = SwiftyBeaver.self
 
 extension OpenVPN {
     
@@ -547,6 +544,8 @@ extension OpenVPN.Configuration {
 }
 
 // MARK: Encoding
+
+private let log = PIATunnelKitLogger.logger(for: OpenVPN.Configuration.self)
 
 extension OpenVPN.Configuration {
 

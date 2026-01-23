@@ -35,13 +35,12 @@
 //
 
 import Foundation
-import SwiftyBeaver
 import TunnelKitCore
 import TunnelKitOpenVPNCore
 import CTunnelKitCore
 import CTunnelKitOpenVPNProtocol
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: OpenVPN.SessionKey.self)
 
 extension OpenVPN {
     class SessionKey {

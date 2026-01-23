@@ -1,11 +1,9 @@
 //
-//  AppDelegate.swift
-//  Demo
+//  PIATunnelKitLogger.swift
+//  TunnelKit
 //
-//  Created by Davide De Rosa on 10/15/17.
-//  Copyright (c) 2021 Davide De Rosa. All rights reserved.
-//
-//  https://github.com/keeshux
+//  Created by Diego Trevisan on 02.01.26.
+//  Copyright © 2026 Private Internet Access, Inc.
 //
 //  This file is part of TunnelKit.
 //
@@ -23,21 +21,22 @@
 //  along with TunnelKit.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Cocoa
+import Logging
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+public enum PIATunnelKitLogger {
+    private static var isBootstrapped = false
 
-
-
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+    public static func bootstrap() {
+        guard !isBootstrapped else { return }
+        LoggingSystem.bootstrap { label in
+            PIATunnelKitLogHandler(label: label)
+        }
+        isBootstrapped = true
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+    public static func logger(for type: Any.Type) -> Logger {
+        bootstrap()
+        let category = String(describing: type)
+        return Logger(label: category)
     }
-
-
 }
-

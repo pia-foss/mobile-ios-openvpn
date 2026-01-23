@@ -35,7 +35,7 @@
 //
 
 import NetworkExtension
-import SwiftyBeaver
+import Logging
 #if os(iOS)
 import SystemConfiguration.CaptiveNetwork
 #else
@@ -49,7 +49,7 @@ import TunnelKitOpenVPNProtocol
 import TunnelKitAppExtension
 import CTunnelKitCore
 
-private let log = SwiftyBeaver.self
+private let log = PIATunnelKitLogger.logger(for: OpenVPNTunnelProvider.self)
 
 /**
  Provides an all-in-one `NEPacketTunnelProvider` implementation for use in a
@@ -61,15 +61,9 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
     
     /// An optional string describing host app version on tunnel start.
     public var appVersion: String?
-
-    /// The log separator between sessions.
-    public var logSeparator = "--- EOF ---"
     
     /// The maximum number of lines in the log.
     public var maxLogLines = 1000
-    
-    /// The log level when `OpenVPNTunnelProvider.Configuration.shouldDebug` is enabled.
-    public var debugLogLevel: SwiftyBeaver.Level = .debug
     
     /// The number of milliseconds after which a DNS resolution fails.
     public var dnsTimeout = 3000
@@ -93,8 +87,6 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
     public var fallbackDNSServers = [""]
     
     // MARK: Constants
-    
-    private let memoryLog = MemoryDestination()
 
     private let tunnelQueue = DispatchQueue(label: OpenVPNTunnelProvider.description(), qos: .utility)
     
@@ -185,30 +177,11 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
                     break
                 }
             }
-            NSLog(message ?? "Unexpected error in tunnel configuration: \(e)")
+            log.error("\(message ?? "Unexpected error in tunnel configuration: \(e)")")
             completionHandler(e)
             return
         }
 
-        // prepare for logging (append)
-        if let content = cfg.existingLog(in: appGroup) {
-            var existingLog = content.components(separatedBy: "\n")
-            if let i = existingLog.firstIndex(of: logSeparator) {
-                existingLog.removeFirst(i + 2)
-            }
-            
-            existingLog.append("")
-            existingLog.append(logSeparator)
-            existingLog.append("")
-            memoryLog.start(with: existingLog)
-        }
-        configureLogging(
-            debug: cfg.shouldDebug,
-            customFormat: cfg.debugLogFormat
-        )
-        
-        // logging only ACTIVE from now on
-        
         // override library configuration
         if let masksPrivateData = cfg.masksPrivateData {
             CoreConfiguration.masksPrivateData = masksPrivateData
@@ -268,7 +241,6 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
         cfg.clearLastError(in: appGroup)
 
         guard let session = session else {
-            flushLog()
             completionHandler()
             forceExitOnMac()
             return
@@ -283,7 +255,6 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
                 return
             }
             log.warning("Tunnel not responding after \(weakSelf.shutdownTimeout) milliseconds, forcing stop")
-            weakSelf.flushLog()
             pendingHandler()
             self?.forceExitOnMac()
         }
@@ -296,7 +267,8 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
         var response: Data?
         switch OpenVPNProvider.Message(messageData) {
         case .requestLog:
-            response = memoryLog.description.data(using: .utf8)
+            let logs = PIATunnelKitLogHandler.logStorage.getAllLogs()
+            response = logs.data(using: .utf8)
 
         case .dataCount:
             if let session = session, let dataCount = session.dataCount() {
@@ -320,11 +292,11 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
     // MARK: Wake/Sleep (debugging placeholders)
 
     open override func wake() {
-        log.verbose("Wake signal received")
+        log.debug("Wake signal received")
     }
     
     open override func sleep(completionHandler: @escaping () -> Void) {
-        log.verbose("Sleep signal received")
+        log.debug("Sleep signal received")
         completionHandler()
     }
     
@@ -377,8 +349,6 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
     }
     
     private func disposeTunnel(error: Error?) {
-        flushLog()
-
         // failed to start
         if pendingStartHandler != nil {
             
@@ -849,32 +819,6 @@ extension OpenVPNTunnelProvider {
     }
     
     // MARK: Logging
-    
-    private func configureLogging(debug: Bool, customFormat: String? = nil) {
-        let logLevel: SwiftyBeaver.Level = (debug ? debugLogLevel : .info)
-        let logFormat = customFormat ?? "$Dyyyy-MM-dd HH:mm:ss.SSS$d $L $N.$F:$l - $M"
-        
-        if debug {
-            let console = ConsoleDestination()
-            console.useNSLog = true
-            console.minLevel = logLevel
-            console.format = logFormat
-            log.addDestination(console)
-        }
-        
-        let memory = memoryLog
-        memory.minLevel = logLevel
-        memory.format = logFormat
-        memory.maxLines = maxLogLines
-        log.addDestination(memoryLog)
-    }
-    
-    private func flushLog() {
-        log.debug("Flushing log...")
-        if let url = cfg.urlForLog(in: appGroup) {
-            memoryLog.flush(to: url)
-        }
-    }
 
     private func logCurrentSSID() {
         InterfaceObserver.fetchCurrentSSID {
