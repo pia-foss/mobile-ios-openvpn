@@ -43,6 +43,8 @@ import TunnelKitOpenVPNManager
 private let log = PIATunnelKitLogger.logger(for: ConnectionStrategy.self)
 
 class ConnectionStrategy {
+    static let empty: ConnectionStrategy = .init()
+
     struct Endpoint: CustomStringConvertible {
         let record: DNSRecord
         
@@ -72,6 +74,14 @@ class ConnectionStrategy {
     private var currentEndpointIndex: Int
     
     private let resolvedAddresses: [String]
+
+    private init() {
+        hostname = nil
+        endpointProtocols = []
+        endpoints = []
+        currentEndpointIndex = 0
+        resolvedAddresses = []
+    }
 
     init(configuration: OpenVPNProvider.Configuration) {
         hostname = configuration.sessionConfiguration.hostname

@@ -108,10 +108,10 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
 
     private lazy var defaults = UserDefaults(suiteName: appGroup)
     
-    private var cfg: OpenVPNProvider.Configuration!
-    
-    private var strategy: ConnectionStrategy!
-    
+    private var cfg: OpenVPNProvider.Configuration = OpenVPNProvider.ConfigurationBuilder.defaults
+
+    private var strategy: ConnectionStrategy = .empty
+
     // MARK: Internal state
 
     private var session: OpenVPNSession?
