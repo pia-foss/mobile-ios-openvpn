@@ -33,7 +33,10 @@ public enum ConfigurationError: Error {
     
     /// A required option is missing.
     case missingConfiguration(option: String)
-    
+
+    /// Parameter cachesURL is nil.
+    case missingCachesURL
+
     /// An option is unsupported.
     case unsupportedConfiguration(option: String)
     

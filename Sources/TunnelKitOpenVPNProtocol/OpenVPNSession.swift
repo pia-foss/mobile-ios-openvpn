@@ -185,9 +185,13 @@ public class OpenVPNSession: Session {
      - Parameter queue: The `DispatchQueue` where to run the session loop.
      - Parameter configuration: The `Configuration` to use for this session.
      */
-    public init(queue: DispatchQueue, configuration: OpenVPN.Configuration, cachesURL: URL) throws {
+    public init(queue: DispatchQueue, configuration: OpenVPN.Configuration, cachesURL: URL?) throws {
         guard let ca = configuration.ca else {
             throw ConfigurationError.missingConfiguration(option: "ca")
+        }
+
+        guard let cachesURL else {
+            throw ConfigurationError.missingCachesURL
         }
 
         self.queue = queue
