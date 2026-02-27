@@ -92,26 +92,29 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
     
     private let prngSeedLength = 64
     
-    private var cachesURL: URL {
-        guard let appGroup = appGroup else {
-            fatalError("Accessing cachesURL before parsing app group")
+    private var cachesURL: URL? {
+        guard
+            !appGroup.isEmpty,
+            let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)
+        else {
+            return nil
         }
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup) else {
-            fatalError("No access to app group: \(appGroup)")
-        }
+
         return containerURL.appendingPathComponent("Library/Caches/")
     }
 
     // MARK: Tunnel configuration
 
-    private var appGroup: String!
+    private var appGroup: String = ""
 
     private lazy var defaults = UserDefaults(suiteName: appGroup)
     
-    private var cfg: OpenVPNProvider.Configuration!
-    
-    private var strategy: ConnectionStrategy!
-    
+    // Reassigned in startTunnel(with:completionHandler:)
+    private var cfg: OpenVPNProvider.Configuration = OpenVPNProvider.ConfigurationBuilder.defaults
+
+    // Reassigned in startTunnel(with:completionHandler:)
+    private var strategy: ConnectionStrategy = .empty
+
     // MARK: Internal state
 
     private var session: OpenVPNSession?
