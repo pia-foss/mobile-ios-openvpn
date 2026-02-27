@@ -107,7 +107,19 @@ public class OpenVPNSession: Session {
     
     /// An optional `OpenVPNSessionDelegate` for receiving session events.
     public weak var delegate: OpenVPNSessionDelegate?
-    
+
+    /// Handler for sending TCP pings through the tunnel.
+    /// Calls the completion handler with true if the ping was successfully sent.
+    public var tcpPingHandler: ((@escaping (Bool) -> Void) -> Void) = { completion in
+        completion(false)
+    }
+
+    /// Maximum consecutive TCP ping failures before terminating tunnel
+    private let maxTcpPingFailures = 5
+
+    /// Counter for consecutive TCP ping failures
+    private var tcpPingFailureCount = 0
+
     // MARK: State
 
     private let queue: DispatchQueue
@@ -155,8 +167,6 @@ public class OpenVPNSession: Session {
     private var nextPushRequestDate: Date?
     
     private var connectedDate: Date?
-
-    private var lastPing: BidirectionalState<Date>
     
     private(set) var isStopping: Bool
     
@@ -199,7 +209,6 @@ public class OpenVPNSession: Session {
         oldKeys = []
         negotiationKeyIdx = 0
         isRenegotiating = false
-        lastPing = BidirectionalState(withResetValue: Date.distantPast)
         isStopping = false
 
         if let tlsWrap = configuration.tlsWrap {
@@ -423,8 +432,6 @@ public class OpenVPNSession: Session {
             log.warning("Discarding \(packets.count) LINK packets (should not handle)")
             return
         }
-        
-        lastPing.inbound = Date()
 
         var dataPacketsByKey = [UInt8: [Data]]()
         
@@ -532,21 +539,28 @@ public class OpenVPNSession: Session {
             return
         }
         
-        let now = Date()
-        guard now.timeIntervalSince(lastPing.inbound) <= keepAliveTimeout else {
-            deferStop(.shutdown, OpenVPNError.pingTimeout)
-            return
-        }
+        // Use TCP ping handler
+        tcpPingHandler { [weak self] success in
+            guard let self = self else {
+                return
+            }
 
-        // is keep-alive enabled?
-        if let _ = keepAliveInterval {
-            log.debug("Send ping")
-            sendDataPackets([OpenVPN.DataPacket.pingString])
-            lastPing.outbound = Date()
-        }
+            if success {
+                tcpPingFailureCount = 0
+                log.debug("TCP ping sent successfully")
+            } else {
+                tcpPingFailureCount += 1
+                log.warning("TCP ping failed (\(self.tcpPingFailureCount)/\(self.maxTcpPingFailures))")
 
-        // schedule even just to check for ping timeout
-        scheduleNextPing()
+                if tcpPingFailureCount >= maxTcpPingFailures {
+                    log.error("Max TCP ping failures, terminating tunnel")
+                    deferStop(.shutdown, OpenVPNError.connectivityCheckFailed)
+                    return
+                }
+            }
+
+            self.scheduleNextPing()
+        }
     }
     
     private func scheduleNextPing() {

@@ -37,8 +37,8 @@
 import Foundation
 
 /// The possible errors raised/thrown during `OpenVPNSession` operation.
-public enum OpenVPNError: String, Error {
-    
+public enum OpenVPNError: String, CustomNSError {
+
     /// The negotiation timed out.
     case negotiationTimeout
     
@@ -66,9 +66,6 @@ public enum OpenVPNError: String, Error {
     /// A write operation failed at the link layer (e.g. network unreachable).
     case failedLinkWrite
     
-    /// The server couldn't ping back before timeout.
-    case pingTimeout
-    
     /// The session reached a stale state and can't be recovered.
     case staleSession
 
@@ -80,4 +77,7 @@ public enum OpenVPNError: String, Error {
 
     /// Remote server shut down (--explicit-exit-notify).
     case serverShutdown
+
+    /// Connectivity check failed.
+    case connectivityCheckFailed
 }
