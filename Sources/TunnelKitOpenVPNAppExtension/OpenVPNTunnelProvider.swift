@@ -109,8 +109,10 @@ open class OpenVPNTunnelProvider: NEPacketTunnelProvider {
 
     private lazy var defaults = UserDefaults(suiteName: appGroup)
     
+    // Reassigned in startTunnel(with:completionHandler:)
     private var cfg: OpenVPNProvider.Configuration = OpenVPNProvider.ConfigurationBuilder.defaults
 
+    // Reassigned in startTunnel(with:completionHandler:)
     private var strategy: ConnectionStrategy = .empty
 
     // MARK: Internal state
