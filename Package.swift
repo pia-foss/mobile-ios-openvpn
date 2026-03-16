@@ -32,7 +32,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log", from: "1.8.0"),
-        .package(url: "git@github.com:pia-foss/ios-openssl.git", branch: "main")
+        .package(url: "git@github.com:pia-foss/ios-openssl.git", exact: "1.0.0")
     ],
     targets: [
         .target(

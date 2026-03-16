@@ -1,13 +1,12 @@
 {
-  "originHash" : "8ba34f1660f7a248aba66932a6a45915089a3af074a01f073ca7adae1fceb22f",
   "pins" : [
     {
       "identity" : "ios-openssl",
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:pia-foss/ios-openssl.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "ea32980bbd431cd2fd505538093c6258b0972099"
+        "revision" : "e7f9ffdd072fa8709ee25ba8cd2aa5d95f90a6a5",
+        "version" : "1.0.0"
       }
     },
     {
@@ -20,5 +19,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
