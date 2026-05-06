@@ -6,7 +6,8 @@ let package = Package(
     name: "TunnelKit",
     platforms: [
         .iOS(.v15),
-        .macOS(.v10_15)
+        .macOS(.v10_15),
+        .macCatalyst(.v15)
     ],
     products: [
         .library(

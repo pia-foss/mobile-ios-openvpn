@@ -61,6 +61,16 @@
  * $FreeBSD: src/sys/net/route.h,v 1.36.2.1 2000/08/16 06:14:23 jayanth Exp $
  */
 
+#include <TargetConditionals.h>
+
+#if TARGET_OS_OSX || TARGET_OS_MACCATALYST
+// On macOS / Mac Catalyst, <net/route.h> is part of the public SDK.
+// Use it directly; otherwise this vendored copy and the SDK copy collide
+// on the shared `_NET_ROUTE_H_` guard, with mismatched `struct rt_metrics`
+// across translation units (LTO error).
+#include <net/route.h>
+#else
+
 #ifndef _NET_ROUTE_H_
 #define _NET_ROUTE_H_
 #include <sys/appleapiopts.h>
@@ -255,3 +265,5 @@ struct rt_addrinfo {
 
 
 #endif /* _NET_ROUTE_H_ */
+
+#endif /* TARGET_OS_OSX || TARGET_OS_MACCATALYST */
